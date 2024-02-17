@@ -22,7 +22,7 @@
     </div>
 </div>
 
-<script>
+<!-- <script>
     function processImage() {
         const imageInput = document.getElementById('imageInput');
         const uploadedImage = document.getElementById('uploadedImage');
@@ -64,6 +64,79 @@
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    }
+
+    document.getElementById('imageInput').addEventListener('change', processImage);
+</script> -->
+<script>
+    function processImage() {
+        const imageInput = document.getElementById('imageInput');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const colorPalette = document.getElementById('colorPalette');
+        const copyButton = document.getElementById('copyButton');
+
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        const img = new Image();
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            const imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+
+            const colorCount = {};
+            for (let i = 0; i < imageData.length; i += 4) {
+                const color = [imageData[i], imageData[i + 1], imageData[i + 2]];
+                const hexColor = rgbToHex(color[0], color[1], color[2]);
+                colorCount[hexColor] = (colorCount[hexColor] || 0) + 1;
+            }
+
+            const sortedColors = Object.keys(colorCount).sort((a, b) => colorCount[b] - colorCount[a]);
+            colorPalette.innerHTML = '';
+            for (let i = 0; i < Math.min(sortedColors.length, 5); i++) {
+                const hexColor = sortedColors[i];
+                const rgbColor = hexToRgb(hexColor);
+                const div = document.createElement('div');
+                div.style.backgroundColor = hexColor;
+                div.style.width = '20px';
+                div.style.height = '20px';
+                div.style.margin = '5px';
+                colorPalette.appendChild(div);
+
+                const colorCode = document.createElement('span');
+                colorCode.innerText = `HEX: ${hexColor}, RGB: ${rgbColor}`;
+                colorPalette.appendChild(colorCode);
+                colorPalette.appendChild(document.createElement('br'));
+            }
+
+            copyButton.addEventListener('click', () => {
+                const paletteCode = sortedColors.slice(0, 5).join(', ');
+                navigator.clipboard.writeText(paletteCode);
+                alert('Color palette copied to clipboard!');
+            });
+        };
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            uploadedImage.src = e.target.result;
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function hexToRgb(hex) {
+        const bigint = parseInt(hex.substring(1), 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `${r}, ${g}, ${b}`;
     }
 
     document.getElementById('imageInput').addEventListener('change', processImage);
