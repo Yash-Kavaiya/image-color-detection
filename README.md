@@ -17,7 +17,7 @@ This website is a powerful tool for designers, artists, and anyone who wants to 
 
 ## **Example**
 
-[Include an image or screenshot of your website in action, demonstrating the image upload and color palette generation]
+![Demo](./image.png)
 
 
 ## **Future Development**
