@@ -1,4 +1,4 @@
-# **Project Title: Image Color Palette Generator**
+# **Project Title: Image Color Palette Detector**
 
 ## **Description**
 
